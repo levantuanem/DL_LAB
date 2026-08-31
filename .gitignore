@@ -132,3 +132,7 @@ docs/_build/
 # Streamlit
 # =========================
 .streamlit/secrets.toml
+
+
+# QuickDraw dataset
+data/raw/Quickdraw/
