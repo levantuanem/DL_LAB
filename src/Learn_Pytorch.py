@@ -2,19 +2,67 @@ from torchvision.datasets import CIFAR10
 from torch.utils.data import Dataset
 import os
 import pickle
+import torch
+# =======================================
+# ================ TENSOR ===============
+# =======================================
+a = torch.tensor(3)
+b = torch.tensor([1, 2, 3])
+c = torch.tensor([[1, 2, 3], [4, 5, 6]])
+d = torch.tensor([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
 
-# train_dataset = CIFAR10(root="./data/raw/cifar10", train=True, download=True)
-# test_dataset = CIFAR10(root="./data/raw/cifar10", train=False, download=True)
-# image, label = train_dataset.__getitem__(2000)
-# print(label)
-# image.show()
+tensor_list = torch.tensor([[[1, 2, 3],
+                           [4, 5, 6],
+                            [7, 8, 9]]])
+print(tensor_list.shape)
+print(tensor_list.ndim)
+print(tensor_list.dtype)
+print(tensor_list.device)
+
+# ================================================
+# ================ Pytorch: Image to tensor ======
+# ================================================
+# CASE 1: USE OPENCV
+import cv2
+import torch
+image = cv2.imread(r'D:\AI_LAB\DL_LAB\data\raw\images\effen.jpg')
+cv2.imshow("image", image)
+image = torch.from_numpy(image)
+print("image shape: {}".format(image.shape))
+print("Image number of dimensions: {}".format(image.ndim))
+cv2.waitKey(0)
+
+# CASE 2: USE PIL
+from PIL import Image
+from torchvision.transforms import ToTensor
+image = Image.open(r'D:\AI_LAB\DL_LAB\data\raw\images\effen.jpg')
+image.show()
+transform = ToTensor()
+image = transform(image)
+print("image shape: {}".format(image.shape))
+print("Image number of dimensions: {}".format(image.ndim))
 
 
+# ================================================
+# ================ Pytorch: Dataset ==============
+# ================================================
+# CASE1: USE TORCHVISION DATASET (được định nghĩa sẵn)
+from torchvision.datasets import CIFAR10
+train_dataset = CIFAR10(root="data", train=True, download=True)
+test_dataset = CIFAR10(root="data", train=False, download=True)
+index = 2000
+image, label = train_dataset.__getitem__(index)
+image.show()
+print(image.size)
+print(image.label)
+print(train_dataset.classes)
+print(train_dataset.class_to_idx)
+
+# CASE 2: USE IMAGE FOLDER DATASET (dataset từ folder hình ảnh)
+from torchvision.datasets import ImageFolder
 
 
-
-##########################
-# TẠO DATASET CỦA MÌNH
+# CASE 3: DEFINE MY OWN DATASET (dataset tự định nghĩa)
 class MyDataset(Dataset):
     def __init__(self, root, train=True):
         if train:
