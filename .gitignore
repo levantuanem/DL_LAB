@@ -5,6 +5,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+
 # =========================
 # Virtual Environment
 # =========================
@@ -14,12 +15,14 @@ env/
 ENV/
 env.bak/
 venv.bak/
+
 # =========================
 # Jupyter / IPython
 # =========================
 .ipynb_checkpoints/
 profile_default/
 ipython_config.py
+
 # =========================
 # VS Code / IDE
 # =========================
@@ -28,8 +31,9 @@ ipython_config.py
 .spyderproject
 .spyproject
 .ropeproject
+
 # =========================
-# Python Testing / Cache
+# Testing / Cache
 # =========================
 .pytest_cache/
 .mypy_cache/
@@ -45,6 +49,7 @@ htmlcov/
 .cache
 coverage.xml
 nosetests.xml
+
 # =========================
 # Build / Distribution
 # =========================
@@ -55,20 +60,24 @@ dist/
 *.egg
 wheels/
 *.whl
+
 # =========================
 # Environment Variables
 # =========================
 .env
 .env.*
+
 # =========================
 # OS
 # =========================
 .DS_Store
 Thumbs.db
+
 # =========================
 # Logs
 # =========================
 *.log
+
 # =========================
 # Temporary Files
 # =========================
@@ -76,6 +85,8 @@ Thumbs.db
 *.temp
 *.bak
 tempCodeRunnerFile.py
+**/tempCodeRunnerFile.py
+
 # =========================
 # ML Models / Artifacts
 # =========================
@@ -87,12 +98,12 @@ tempCodeRunnerFile.py
 *.pt
 *.pth
 *.onnx
+
 # =========================
-# Data
+# Dataset
 # =========================
-# Chỉ bỏ comment nếu dataset quá lớn:
-# data/raw/
-# data/processed/
+data/
+
 # =========================
 # Packaging / Tools
 # =========================
@@ -101,21 +112,20 @@ tempCodeRunnerFile.py
 .pdm-build/
 __pypackages__/
 .pybuilder/
-.pyre/
-.pytype/
+
 # =========================
 # Documentation Build
 # =========================
 docs/_build/
 /site
+
 # =========================
 # PyInstaller
 # =========================
 *.manifest
 *.spec
+
 # =========================
 # Streamlit
 # =========================
 .streamlit/secrets.toml
-# QuickDraw dataset
-data/raw/Quickdraw/
