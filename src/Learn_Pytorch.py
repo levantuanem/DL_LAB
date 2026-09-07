@@ -167,27 +167,177 @@ from PIL import Image
 # ================================================
 # ===== Pytorch: DATA LOADER =====================
 # ================================================
+# from torchvision.datasets import CIFAR10
+# from torch.utils.data import DataLoader
+# from torchvision.transforms import ToTensor, Compose, Normalize, Resize
+# if __name__ == "__main__":
+#     transform = Compose([Resize((32, 32)), 
+#                         ToTensor(), 
+#                         Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
+#     epochs = 10
+#     train_dataset = CIFAR10(root=r"D:\AI_LAB\DL_LAB\data\raw", 
+#                             train=True, 
+#                             download=False,
+#                             transform= transform)
+    
+#     image, label = train_dataset.__getitem__(1234)
+#     training_loader = DataLoader(dataset= train_dataset, 
+#                                  batch_size=32, 
+#                                  shuffle=True,
+#                                  drop_last=True)
+#     for epoch in range(epochs):
+#         for images, labels in training_loader:
+#             print("images shape: {}".format(images.shape))
+#             print("labels shape: {}".format(labels.shape))
+#             break
+
+
+
+# ================================================
+# ===== Pytorch: STEP1: SETUP DATASET ============
+# ================================================
 from torchvision.datasets import CIFAR10
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor, Compose, Normalize, Resize
 if __name__ == "__main__":
-    transform = Compose([Resize((32, 32)), 
-                        ToTensor(), 
-                        Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
-    epochs = 10
-    train_dataset = CIFAR10(root=r"D:\AI_LAB\DL_LAB\data\raw", 
-                            train=True, 
+    training_dataset = CIFAR10(root=r"D:\AI_LAB\DL_LAB\data\raw",
+                                train=True,  
+                                download=False,
+                                transform= Compose([Resize((32, 32)), 
+                                                    ToTensor(), 
+                                                    Normalize(
+                                                        mean=[0.5, 0.5, 0.5], 
+                                                        std=[0.5, 0.5, 0.5])]))
+    test_dataset = CIFAR10(root=r"D:\AI_LAB\DL_LAB\data\raw",
+                            train=False,
                             download=False,
-                            transform= transform)
-    
-    image, label = train_dataset.__getitem__(1234)
-    training_loader = DataLoader(dataset= train_dataset, 
-                                 batch_size=32, 
-                                 shuffle=True,
-                                 drop_last=True, 
-                                 num_workers=4)
-    for epoch in range(epochs):
-        for images, labels in training_loader:
-            print("images shape: {}".format(images.shape))
-            print("labels shape: {}".format(labels.shape))
-            break
+                            transform= Compose([Resize((32, 32)),
+                                                ToTensor(), 
+                                                Normalize(
+                                                    mean=[0.5, 0.5, 0.5], 
+                                                    std=[0.5, 0.5, 0.5])]))
+    training_loader = DataLoader(dataset= training_dataset,
+                                    batch_size=32, 
+                                    shuffle=True,
+                                    drop_last=True)
+    test_loader = DataLoader(dataset= test_dataset,
+                            batch_size=32,
+                            shuffle=False,
+                            drop_last=True)
+    for images, labels in training_loader:
+        print("images shape: {}".format(images.shape))
+        print("labels shape: {}".format(labels.shape))
+        break
+# ================================================
+# ===== Pytorch: STEP2: DIFINE A NEURAL NETWORK ==
+# ================================================
+import torch
+import torch.nn as nn
+
+class MyNeuralNetwork(nn.Module):
+    def __init__(self, num_classes=10) -> None:
+        super().__init__()
+        self.flatten = nn.Flatten()
+        self.fc1 = nn.Sequential(
+            nn.Linear(in_features= 3*32*32, out_features= 256),
+            nn.ReLU(inplace= True)
+        )
+
+        self.fc2 = nn.Sequential(
+            nn.Linear(in_features= 256, out_features= 512),
+            nn.ReLU(inplace= True)
+        )
+
+        self.fc3 = nn.Sequential(
+            nn.Linear(in_features= 512, out_features= 1024),
+            nn.ReLU(inplace= True)
+        )
+
+        self.fc4 = nn.Sequential(
+            nn.Linear(in_features= 1024, out_features= 512),
+            nn.ReLU(inplace= True)
+        )
+
+        self.fc5 = nn.Sequential(
+            nn.Linear(in_features= 512, out_features= num_classes),
+            nn.ReLU(inplace= True)
+        )
+    def forward(self, x):
+        x = self.flatten(x)
+        x = self.fc1(x)
+        x = self.fc2(x)
+        x = self.fc3(x)
+        x = self.fc4(x)
+        x = self.fc5(x)
+        return x
+
+if __name__ == "__main__":
+    model = MyNeuralNetwork()
+    input_data = torch.randn(8, 3, 32, 32)
+    # if torch.cuda.is_available():
+    #     model = model.cuda()
+    #     input_data = input_data.cuda()
+    result = model.forward(input_data)
+    print("result shape: {}".format(result.shape))
+
+
+# ==================================================
+# ===== Pytorch: STEP3: DEFINE LOSS AND OPTIMIZER ==
+# ==================================================
+import torch.nn as nn
+from torch.optim import SGD
+criterion = nn.CrossEntropyLoss()
+optimizer = SGD(params= model.parameters(), 
+                lr= 0.01, 
+                momentum= 0.9, 
+                weight_decay= 0.0005)
+
+# ==================================================
+# ===== Pytorch: STEP4: TRAIN THE NETWORK ==========
+# ==================================================
+batch_size = 32
+num_epochs = 10
+
+transform = Compose([Resize((32, 32)),
+                    ToTensor(),
+                    Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
+
+train_set = CIFAR10(root=r"D:\AI_LAB\DL_LAB\data\raw", 
+                    train=True, 
+                    download=False, 
+                    transform=transform)
+
+training_loader = DataLoader(dataset= train_set, 
+                                batch_size=batch_size, 
+                                shuffle=True,
+                                drop_last=True)
+
+test_set = CIFAR10(root=r"D:\AI_LAB\DL_LAB\data\raw",
+                    train=False,
+                    download=False,
+                    transform=transform)
+
+test_loader = DataLoader(dataset= test_set,
+                         batch_size=batch_size,
+                         shuffle=False,
+                         drop_last=True)
+
+model = MyNeuralNetwork()
+criterion = nn.CrossEntropyLoss()
+optimizer = SGD(params= model.parameters(),
+                lr= 0.01, 
+                momentum= 0.9, 
+                weight_decay= 0.0005)
+num_iterations = len(training_loader)
+
+for epoch in range(num_epochs):
+    model.train()
+    for i, (images, labels) in enumerate(training_loader):
+        # Forward pass
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+        
+        # Backward pass and optimization
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
